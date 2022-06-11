@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: star-usercontrol
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/yume
+    username: root
+    password: 521125
+server:
+  port: 8080
+mysql:
