@@ -1,5 +1,4 @@
 package com.alex.starusercontrol.service;
-import java.util.Date;
 
 import com.alex.starusercontrol.model.domain.User;
 import org.junit.jupiter.api.Assertions;
@@ -8,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 用户服务测试
@@ -21,7 +20,7 @@ class UserServiceTest {
     UserService userService;
 
     @Test
-    void testAddUser()  {
+    void testAddUser() {
         User user = new User();
         user.setUsername("Alex");
         user.setUserAccount("123");
@@ -33,5 +32,46 @@ class UserServiceTest {
         boolean save = userService.save(user);
         System.out.println(user.getId());
         assertTrue(save);
+    }
+
+    @Test
+    void testRegist() {
+        String userAccount = "alex";
+        String userPassword = "";
+        String checkPassword = "12345678";
+        long result = 0;
+        //非空
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+        //账户长度不小于四位
+        userAccount = "al";
+        userPassword ="12345678";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+        ///密码不小于八位
+        userAccount = "alex";
+        userPassword = "123456";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+        //账户包含特殊字符
+        userAccount = "al ex";
+        userPassword = "12345678";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+        //密码和校验密码不相同
+        userAccount = "alex";
+        checkPassword = "123456789";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+        //账户不能重复
+        userAccount = "123";
+        checkPassword = "12345678";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+        //正确的
+        userAccount = "alex";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+
     }
 }
