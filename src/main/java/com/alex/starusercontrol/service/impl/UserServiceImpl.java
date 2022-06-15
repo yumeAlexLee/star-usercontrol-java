@@ -12,9 +12,10 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.alex.starusercontrol.content.UserContent.USER_LOGIN_STATE;
 
 /**
 * @author 91627
@@ -33,11 +34,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * 密码盐值
      */
     private static final String SALT = "yume";
-
-    /**
-     * 用户登录态键
-     */
-    private static final String USER_LOGIN_STATE = "userLoginState";
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -83,7 +79,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public User doLogin(String userAccount, String userPassword, HttpServletRequest request) {
+    public User userLogin(String userAccount, String userPassword, HttpServletRequest request) {
 
         //1.校验
         if (StringUtils.isAnyBlank(userAccount,userPassword)){
@@ -105,8 +101,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
         //3.查询用户是否存在
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount",userAccount);
-        queryWrapper.eq("userPassword",encryptPassword);
+        queryWrapper.eq("user_account",userAccount);
+        queryWrapper.eq("user_password",encryptPassword);
         User user = userMapper.selectOne(queryWrapper);
         //用户不存在
         if (user == null) {
@@ -114,20 +110,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return null;
         }
         //5.用户信息脱敏
-        User safetyUser = new User();
-        safetyUser.setId(user.getId());
-        safetyUser.setUsername(user.getUsername());
-        safetyUser.setUserAccount(user.getUserAccount());
-        safetyUser.setAvatarUrl(user.getAvatarUrl());
-        safetyUser.setGender(user.getGender());
-        safetyUser.setPhone(user.getPhone());
-        safetyUser.setEmail(user.getEmail());
-        safetyUser.setUserStatus(user.getUserStatus());
-        safetyUser.setCreateTime(user.getCreateTime());
+        User safetyUser = getSafetyUser(user);
         //4.记录用户登录态
         request.getSession().setAttribute(USER_LOGIN_STATE,safetyUser);
+        return safetyUser;
+    }
 
-
+    /**
+     * 用户脱敏
+     * @param originalUser
+     * @return
+     */
+    @Override
+    public User getSafetyUser(User originalUser) {
+        User safetyUser = new User();
+        safetyUser.setId(originalUser.getId());
+        safetyUser.setUsername(originalUser.getUsername());
+        safetyUser.setUserAccount(originalUser.getUserAccount());
+        safetyUser.setAvatarUrl(originalUser.getAvatarUrl());
+        safetyUser.setGender(originalUser.getGender());
+        safetyUser.setPhone(originalUser.getPhone());
+        safetyUser.setEmail(originalUser.getEmail());
+        safetyUser.setUserRole(originalUser.getUserRole());
+        safetyUser.setUserStatus(originalUser.getUserStatus());
+        safetyUser.setCreateTime(originalUser.getCreateTime());
         return safetyUser;
     }
 }

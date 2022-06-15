@@ -6,6 +6,9 @@ spring:
     url: jdbc:mysql://localhost:3306/yume
     username: root
     password: 521125
+  # session 失效时间
+  session:
+    timeout: 86400
 server:
   port: 8080
 mybatis-plus:

@@ -1,9 +1,12 @@
 package com.alex.starusercontrol.service;
 
+import com.alex.starusercontrol.mapper.UserMapper;
 import com.alex.starusercontrol.model.domain.User;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 
@@ -18,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UserServiceTest {
     @Resource
     UserService userService;
+    @Resource
+    UserMapper userMapper;
 
     @Test
     void testAddUser() {
@@ -71,7 +76,9 @@ class UserServiceTest {
         //正确的
         userAccount = "alex";
         result = userService.userRegister(userAccount, userPassword, checkPassword);
-        Assertions.assertEquals(-1, result);
+        Assertions.assertEquals(5, result);
 
     }
+
+
 }
